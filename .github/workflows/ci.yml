@@ -1,4 +1,4 @@
-name: CI
+kname: CI
 
 on:
   push:
@@ -10,27 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Get the repository onto the GitHub Actions runner
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Build the same images we tested locally
       - name: Build currencyservice
         run: docker build -t currencyservice-ci-test ./src/currencyservice
 
       - name: Build paymentservice
         run: docker build -t paymentservice-ci-test ./src/paymentservice
 
-      # Scan images for known HIGH/CRITICAL vulnerabilities
       - name: Scan currencyservice image
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.33.1
         with:
           image-ref: currencyservice-ci-test:latest
           severity: CRITICAL,HIGH
           exit-code: '1'
 
       - name: Scan paymentservice image
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.33.1
         with:
           image-ref: paymentservice-ci-test:latest
           severity: CRITICAL,HIGH
