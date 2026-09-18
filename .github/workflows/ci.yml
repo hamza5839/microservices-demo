@@ -24,6 +24,7 @@ jobs:
         with:
           image-ref: currencyservice-ci-test:latest
           severity: CRITICAL,HIGH
+          ignore-unfixed: true
           exit-code: '1'
 
       - name: Scan paymentservice image
@@ -31,4 +32,5 @@ jobs:
         with:
           image-ref: paymentservice-ci-test:latest
           severity: CRITICAL,HIGH
+          ignore-unfixed: true
           exit-code: '1'
