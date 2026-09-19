@@ -13,6 +13,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        service:
+          - adservice
+          - cartservice
+          - checkoutservice
+          - currencyservice
+          - frontend
+          - paymentservice
+          - productcatalogservice
+          - recommendationservice
+          - shippingservice
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -24,30 +37,21 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build currencyservice
-        run: docker build -t ghcr.io/${{ github.repository }}/currencyservice:${{ github.sha }} ./src/currencyservice
+      - name: Build image
+        run: |
+          docker build \
+            -t ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }} \
+            ./src/${{ matrix.service }}
 
-      - name: Build paymentservice
-        run: docker build -t ghcr.io/${{ github.repository }}/paymentservice:${{ github.sha }} ./src/paymentservice
-
-      - name: Scan currencyservice image
+      - name: Scan image
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: ghcr.io/${{ github.repository }}/currencyservice:${{ github.sha }}
+          image-ref: ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           exit-code: '0'
 
-      - name: Scan paymentservice image
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          image-ref: ghcr.io/${{ github.repository }}/paymentservice:${{ github.sha }}
-          severity: CRITICAL,HIGH
-          ignore-unfixed: true
-          exit-code: '0'
-
-      - name: Push currencyservice
-        run: docker push ghcr.io/${{ github.repository }}/currencyservice:${{ github.sha }}
-
-      - name: Push paymentservice
-        run: docker push ghcr.io/${{ github.repository }}/paymentservice:${{ github.sha }}
+      - name: Push image
+        run: |
+          docker push \
+            ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }}
