@@ -1,9 +1,13 @@
-name: CI
+name: CI/CD
 
 on:
   push:
     branches:
       - main
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   build:
@@ -13,26 +17,37 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build currencyservice
-        run: docker build -t currencyservice-ci-test ./src/currencyservice
+        run: docker build -t ghcr.io/${{ github.repository }}/currencyservice:${{ github.sha }} ./src/currencyservice
 
       - name: Build paymentservice
-        run: docker build -t paymentservice-ci-test ./src/paymentservice
+        run: docker build -t ghcr.io/${{ github.repository }}/paymentservice:${{ github.sha }} ./src/paymentservice
 
       - name: Scan currencyservice image
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: currencyservice-ci-test:latest
+          image-ref: ghcr.io/${{ github.repository }}/currencyservice:${{ github.sha }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
-          skip-dirs: /usr/local/lib/node_modules/npm
           exit-code: '0'
 
       - name: Scan paymentservice image
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: paymentservice-ci-test:latest
+          image-ref: ghcr.io/${{ github.repository }}/paymentservice:${{ github.sha }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
-          skip-dirs: /usr/local/lib/node_modules/npm
           exit-code: '0'
+
+      - name: Push currencyservice
+        run: docker push ghcr.io/${{ github.repository }}/currencyservice:${{ github.sha }}
+
+      - name: Push paymentservice
+        run: docker push ghcr.io/${{ github.repository }}/paymentservice:${{ github.sha }}
