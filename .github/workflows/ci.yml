@@ -43,7 +43,7 @@ jobs:
             docker build \
               -f ./src/cartservice/src/Dockerfile \
               -t ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }} \
-              ./src/cartservice
+              ./src/cartservice/src
           else
             docker build \
               -t ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }} \
