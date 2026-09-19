@@ -68,6 +68,8 @@ spec:
         env:
         - name: FRONTEND_ADDR
           value: "frontend:80"
+        imagePullSecrets:
+        - name: ghcr-pull
       containers:
       - name: main
         securityContext:
