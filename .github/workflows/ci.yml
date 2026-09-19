@@ -62,3 +62,62 @@ jobs:
         run: |
           docker push \
             ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }}
+
+  update-gitops:
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout GitOps repository
+        uses: actions/checkout@v4
+        with:
+          repository: hamza5839/microservices-demo-gitops
+          token: ${{ secrets.GITOPS_TOKEN }}
+          path: gitops
+
+      - name: Update image tags
+        working-directory: gitops
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_PREFIX: ghcr.io/hamza5839/microservices-demo
+        run: |
+          set -e
+
+          services=(
+            adservice
+            cartservice
+            checkoutservice
+            currencyservice
+            frontend
+            paymentservice
+            productcatalogservice
+            recommendationservice
+            shippingservice
+          )
+
+          for service in "${services[@]}"; do
+            file="kubernetes-manifests/${service}.yaml"
+
+            sed -i \
+              -E "s#(${IMAGE_PREFIX}/${service}:)[^[:space:]]+#\1${IMAGE_TAG}#" \
+              "$file"
+          done
+
+      - name: Commit and push GitOps change
+        working-directory: gitops
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add kubernetes-manifests/
+
+          if git diff --cached --quiet; then
+            echo "No GitOps image changes detected."
+            exit 0
+          fi
+
+          git commit -m "update images to ${IMAGE_TAG}"
+          git push
