@@ -39,9 +39,16 @@ jobs:
 
       - name: Build image
         run: |
-          docker build \
-            -t ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }} \
-            ./src/${{ matrix.service }}
+          if [ "${{ matrix.service }}" = "cartservice" ]; then
+            docker build \
+              -f ./src/cartservice/src/Dockerfile \
+              -t ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }} \
+              ./src/cartservice
+          else
+            docker build \
+              -t ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }} \
+              ./src/${{ matrix.service }}
+          fi
 
       - name: Scan image
         uses: aquasecurity/trivy-action@v0.36.0
