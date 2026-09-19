@@ -43,7 +43,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: currencyservice
+        image: ghcr.io/hamza5839/microservices-demo/currencyservice:f1b3faa648c45b0a067da04f3676f81e139bb002
         ports:
         - name: grpc
           containerPort: 7000
