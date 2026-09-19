@@ -46,6 +46,11 @@ spec:
         image: ghcr.io/hamza5839/microservices-demo/recommendationservice:396df360a5a6f2eaf58e648021183c4fb377d48f
         ports:
         - containerPort: 8080
+        startupProbe:
+          grpc:
+            port: 8080
+          failureThreshold: 30
+          periodSeconds: 5
         readinessProbe:
           periodSeconds: 5
           grpc:
