@@ -44,7 +44,7 @@ spec:
                 - ALL
             privileged: false
             readOnlyRootFilesystem: true
-          image: frontend
+          image: ghcr.io/hamza5839/microservices-demo/frontend:396df360a5a6f2eaf58e648021183c4fb377d48f
           ports:
           - containerPort: 8080
           readinessProbe:

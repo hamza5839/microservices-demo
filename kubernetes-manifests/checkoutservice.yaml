@@ -42,7 +42,7 @@ spec:
                 - ALL
             privileged: false
             readOnlyRootFilesystem: true
-          image: checkoutservice
+          image: ghcr.io/hamza5839/microservices-demo/checkoutservice:396df360a5a6f2eaf58e648021183c4fb377d48f
           ports:
           - containerPort: 5050
           readinessProbe:
