@@ -12,26 +12,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: terraform-validate-ci
+name: terraform-ci
+
 on:
   push:
     branches:
       - main
     paths:
-      - 'terraform/**'
-      - '.github/workflows/terraform-validate-ci.yaml'
+      - "terraform/**"
+      - ".github/workflows/terraform-validate-ci.yaml"
+
   pull_request:
     paths:
-      - 'terraform/**'
-      - '.github/workflows/terraform-validate-ci.yaml'
+      - "terraform/**"
+      - ".github/workflows/terraform-validate-ci.yaml"
+
+permissions:
+  contents: read
+
 jobs:
-  terraform-validate-ci:
+  terraform-ci:
+    name: Terraform CI
     runs-on: ubuntu-24.04
+
+    defaults:
+      run:
+        working-directory: terraform
+
     steps:
-      - uses: actions/checkout@v7
-      - uses: hashicorp/setup-terraform@v4
-      - name: terraform init & validate
-        run: |
-          cd terraform/
-          terraform init -backend=false
-          terraform validate
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+
+      - name: Check Terraform formatting
+        run: terraform fmt -check -diff -recursive
+
+      - name: Initialize Terraform
+        run: terraform init -backend=false
+
+      - name: Validate Terraform
+        run: terraform validate
