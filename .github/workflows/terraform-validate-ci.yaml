@@ -56,6 +56,4 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -input=false \
-          -var="namespace_name=platform-${{ matrix.environment }}" \
-          -var="environment=${{ matrix.environment }}"
+        run: terraform plan -input=false -var="namespace_name=platform-${{ matrix.environment }}" -var="environment=${{ matrix.environment }}"
